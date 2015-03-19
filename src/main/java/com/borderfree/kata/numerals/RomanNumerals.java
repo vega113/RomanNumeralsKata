@@ -2,8 +2,6 @@ package com.borderfree.kata.numerals;
 
 
 import java.util.EnumSet;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 
 /**
  * Created by yuri.zelikov on 18/03/2015.
@@ -43,17 +41,17 @@ public class RomanNumerals {
         }
     }
 
-    static EnumSet<RomanNumeral> romanNumerals = EnumSet.allOf(RomanNumeral.class);
+    final static EnumSet<RomanNumeral> romanNumerals = EnumSet.allOf(RomanNumeral.class);
 
-    public static String arabicToRoman(int arabic) {
-        AccNumeral result = romanNumerals.stream().reduce(new AccNumeral("", arabic),
-                (accNumeral, romanNumeral) -> appendRomanNumeral(accNumeral, romanNumeral),
+    public static String arabicToRoman(final int arabic) {
+        final AccNumeral result = romanNumerals.stream().reduce(new AccNumeral("", arabic),
+                RomanNumerals::appendRomanNumeral,
                 (accNumeral, accNumeral2) ->
                         new AccNumeral(accNumeral.str + accNumeral2.str, accNumeral.remaining - accNumeral2.remaining));
         return result.str;
     }
 
-    private static AccNumeral appendRomanNumeral(AccNumeral acc, RomanNumeral romanNumeral) {
+    private static AccNumeral appendRomanNumeral(final AccNumeral acc, final RomanNumeral romanNumeral) {
         if (acc.remaining >= romanNumeral.arabic) {
             return appendRomanNumeral(new AccNumeral(acc.str + romanNumeral.roman,
                     acc.remaining - romanNumeral.arabic), romanNumeral);

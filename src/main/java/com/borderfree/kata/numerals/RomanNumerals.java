@@ -56,7 +56,8 @@ public class RomanNumerals {
         BinaryOperator<String> romanCombiner;
         BinaryOperator<Integer> arabicCombiner;
 
-        public RomanNumeralsAccumulatorImpl(BiFunction<AccNumeral, RomanNumeral, Boolean> predicate, BinaryOperator<String> romanCombiner, BinaryOperator<Integer> arabicCombiner) {
+        public RomanNumeralsAccumulatorImpl(BiFunction<AccNumeral, RomanNumeral, Boolean> predicate,
+                                            BinaryOperator<String> romanCombiner, BinaryOperator<Integer> arabicCombiner) {
             this.predicate = predicate;
             this.romanCombiner = romanCombiner;
             this.arabicCombiner = arabicCombiner;
@@ -64,8 +65,9 @@ public class RomanNumerals {
 
         @Override
         public AccNumeral accumulate(AccNumeral acc, RomanNumeral romanNumeral) {
-            if(predicate.apply(acc, romanNumeral)) {
-                return accumulate(new AccNumeral(romanCombiner.apply(acc.str, romanNumeral.roman), arabicCombiner.apply(acc.remaining, romanNumeral.arabic)), romanNumeral);
+            if (predicate.apply(acc, romanNumeral)) {
+                return accumulate(new AccNumeral(romanCombiner.apply(acc.str, romanNumeral.roman),
+                        arabicCombiner.apply(acc.remaining, romanNumeral.arabic)), romanNumeral);
             } else {
                 return acc;
             }
@@ -82,7 +84,8 @@ public class RomanNumerals {
                     (str, roman) -> str.replaceFirst(roman, ""),
                     Math::addExact);
 
-    private static <T> T reduce(AccNumeral accNumeral, BiFunction<AccNumeral, RomanNumeral, AccNumeral> accumulator, Function<AccNumeral, T> extractResult) {
+    private static <T> T reduce(AccNumeral accNumeral, BiFunction<AccNumeral, RomanNumeral, AccNumeral> accumulator,
+                                Function<AccNumeral, T> extractResult) {
         final AccNumeral result = ROMAN_NUMERALS.stream().reduce(accNumeral,
                 accumulator::apply,
                 (accNumeral1, accNumeral2) ->
@@ -91,7 +94,8 @@ public class RomanNumerals {
     }
 
     public static String arabicToRoman(final int arabic) {
-        return reduce(new AccNumeral(arabic < 0 ? "-" : "", Math.abs(arabic)), arabicToRomanAccumulator::accumulate, x -> x.str);
+        return reduce(new AccNumeral(arabic < 0 ? "-" : "", Math.abs(arabic)), arabicToRomanAccumulator::accumulate,
+                x -> x.str);
     }
 
     public static int romanToArabic(String roman) {

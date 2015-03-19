@@ -10,6 +10,16 @@ import static org.junit.Assert.assertEquals;
 public class RomanNumeralsTest {
 
     @Test
+    public void minusOne() {
+        assertEquals("-1", "-I", RomanNumerals.arabicToRoman(-1));
+    }
+
+    @Test
+    public void zero() {
+        assertEquals("0", "", RomanNumerals.arabicToRoman(0));
+    }
+
+    @Test
     public void oneTwoThree() {
         assertEquals("1", "I", RomanNumerals.arabicToRoman(1));
         assertEquals("2", "II", RomanNumerals.arabicToRoman(2));

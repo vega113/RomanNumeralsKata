@@ -41,10 +41,10 @@ public class RomanNumerals {
         }
     }
 
-    final static EnumSet<RomanNumeral> romanNumerals = EnumSet.allOf(RomanNumeral.class);
+    final static EnumSet<RomanNumeral> ROMAN_NUMERALS = EnumSet.allOf(RomanNumeral.class);
 
     public static String arabicToRoman(final int arabic) {
-        final AccNumeral result = romanNumerals.stream().reduce(new AccNumeral("", arabic),
+        final AccNumeral result = ROMAN_NUMERALS.stream().reduce(new AccNumeral(arabic < 0 ? "-" : "", Math.abs(arabic)),
                 RomanNumerals::appendRomanNumeral,
                 (accNumeral, accNumeral2) ->
                         new AccNumeral(accNumeral.str + accNumeral2.str, accNumeral.remaining - accNumeral2.remaining));

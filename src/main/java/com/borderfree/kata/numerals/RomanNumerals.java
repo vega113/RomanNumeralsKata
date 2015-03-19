@@ -46,27 +46,19 @@ public class RomanNumerals {
     static EnumSet<RomanNumeral> romanNumerals = EnumSet.allOf(RomanNumeral.class);
 
     public static String arabicToRoman(int arabic) {
-        AccNumeral result = romanNumerals.stream().reduce(new AccNumeral("", arabic), new BiFunction<AccNumeral, RomanNumeral, AccNumeral>(){
-            @Override
-            public AccNumeral apply(AccNumeral accNumeral, RomanNumeral romanNumeral) {
-                return appendRomanNumeral(accNumeral, romanNumeral);
-            }
-        }, new BinaryOperator<AccNumeral>(){
-            @Override
-            public AccNumeral apply(AccNumeral accNumeral, AccNumeral accNumeral2) {
-                return new AccNumeral(accNumeral.str + accNumeral2.str, accNumeral.remaining - accNumeral2.remaining);
-            }
-        });
+        AccNumeral result = romanNumerals.stream().reduce(new AccNumeral("", arabic),
+                (accNumeral, romanNumeral) -> appendRomanNumeral(accNumeral, romanNumeral),
+                (accNumeral, accNumeral2) ->
+                        new AccNumeral(accNumeral.str + accNumeral2.str, accNumeral.remaining - accNumeral2.remaining));
         return result.str;
     }
 
     private static AccNumeral appendRomanNumeral(AccNumeral acc, RomanNumeral romanNumeral) {
-        int remaining = acc.remaining;
-        String str = acc.str;
-        while (remaining >= romanNumeral.arabic ) {
-            str += romanNumeral.roman;
-            remaining -= romanNumeral.arabic;
+        if (acc.remaining >= romanNumeral.arabic) {
+            return appendRomanNumeral(new AccNumeral(acc.str + romanNumeral.roman,
+                    acc.remaining - romanNumeral.arabic), romanNumeral);
+        } else {
+            return acc;
         }
-        return new AccNumeral(str, remaining);
     }
 }

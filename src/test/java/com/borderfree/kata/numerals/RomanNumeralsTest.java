@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 public class RomanNumeralsTest {
 
     @Test
-    public void minusOne() {
+    public void arabicToRomanMinusOne() {
         assertEquals("-1", "-I", RomanNumerals.arabicToRoman(-1));
     }
 
@@ -20,36 +20,36 @@ public class RomanNumeralsTest {
     }
 
     @Test
-    public void oneTwoThree() {
+    public void arabicToRomanOneTwoThree() {
         assertEquals("1", "I", RomanNumerals.arabicToRoman(1));
         assertEquals("2", "II", RomanNumerals.arabicToRoman(2));
         assertEquals("3", "III", RomanNumerals.arabicToRoman(3));
     }
 
     @Test
-    public void four() {
+    public void arabicToRomanFour() {
         assertEquals("4", "IV", RomanNumerals.arabicToRoman(4));
     }
 
     @Test
-    public void five() {
+    public void arabicToRomanFive() {
         assertEquals("5", "V", RomanNumerals.arabicToRoman(5));
     }
 
     @Test
-    public void six() {
+    public void arabicToRomanSix() {
         assertEquals("6", "VI", RomanNumerals.arabicToRoman(6));
         assertEquals("7", "VII", RomanNumerals.arabicToRoman(7));
         assertEquals("8", "VIII", RomanNumerals.arabicToRoman(8));
     }
 
     @Test
-    public void nine() {
+    public void arabicToRomanNine() {
         assertEquals("9", "IX", RomanNumerals.arabicToRoman(9));
     }
 
     @Test
-    public void ten() {
+    public void arabicToRomanTen() {
         assertEquals("10", "X", RomanNumerals.arabicToRoman(10));
         assertEquals("11", "XI", RomanNumerals.arabicToRoman(11));
         assertEquals("12", "XII", RomanNumerals.arabicToRoman(12));
@@ -63,15 +63,28 @@ public class RomanNumeralsTest {
     }
 
     @Test
-    public void twenty() {
+    public void arabicToRomanTwenty() {
         assertEquals("20", "XX", RomanNumerals.arabicToRoman(20));
         assertEquals("21", "XXI", RomanNumerals.arabicToRoman(21));
         assertEquals("30", "XXX", RomanNumerals.arabicToRoman(30));
     }
 
     @Test
-    public void forty() {
+    public void arabicToRomanForty() {
         assertEquals("40", "XL", RomanNumerals.arabicToRoman(40));
         assertEquals("41", "XLI", RomanNumerals.arabicToRoman(41));
+    }
+
+    @Test
+    public void romanToArabicOne() {
+        assertEquals("1", 1, RomanNumerals.romanToArabic("I"));
+    }
+
+    @Test
+    public void romanToArabic() {
+        assertEquals("2", 2, RomanNumerals.romanToArabic("II"));
+        assertEquals("4", 4, RomanNumerals.romanToArabic("IV"));
+        assertEquals("4", 10, RomanNumerals.romanToArabic("X"));
+        assertEquals("19", 19, RomanNumerals.romanToArabic("XIX"));
     }
 }

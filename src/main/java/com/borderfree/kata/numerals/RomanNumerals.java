@@ -2,6 +2,8 @@ package com.borderfree.kata.numerals;
 
 
 import java.util.EnumSet;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 /**
  * Created by yuri.zelikov on 18/03/2015.
@@ -44,19 +46,24 @@ public class RomanNumerals {
     static EnumSet<RomanNumeral> romanNumerals = EnumSet.allOf(RomanNumeral.class);
 
     public static String arabicToRoman(int arabic) {
-        AccNumeral accNumeral = new AccNumeral("", arabic);
-        for (RomanNumeral romanNumeral : romanNumerals) {
-            while (accNumeral.remaining >= romanNumeral.arabic) {
-                accNumeral = appendRomanNumerals(accNumeral, romanNumeral);
+        AccNumeral result = romanNumerals.stream().reduce(new AccNumeral("", arabic), new BiFunction<AccNumeral, RomanNumeral, AccNumeral>(){
+            @Override
+            public AccNumeral apply(AccNumeral accNumeral, RomanNumeral romanNumeral) {
+                return appendRomanNumeral(accNumeral, romanNumeral);
             }
-        }
-        return accNumeral.str;
+        }, new BinaryOperator<AccNumeral>(){
+            @Override
+            public AccNumeral apply(AccNumeral accNumeral, AccNumeral accNumeral2) {
+                return new AccNumeral(accNumeral.str + accNumeral2.str, accNumeral.remaining - accNumeral2.remaining);
+            }
+        });
+        return result.str;
     }
 
-    private static AccNumeral appendRomanNumerals(AccNumeral acc, RomanNumeral romanNumeral) {
+    private static AccNumeral appendRomanNumeral(AccNumeral acc, RomanNumeral romanNumeral) {
         int remaining = acc.remaining;
         String str = acc.str;
-        if (remaining >= romanNumeral.arabic ) {
+        while (remaining >= romanNumeral.arabic ) {
             str += romanNumeral.roman;
             remaining -= romanNumeral.arabic;
         }

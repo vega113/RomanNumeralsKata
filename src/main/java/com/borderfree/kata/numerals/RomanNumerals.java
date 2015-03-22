@@ -3,7 +3,6 @@ package com.borderfree.kata.numerals;
 
 import java.util.EnumSet;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
 /**
@@ -11,13 +10,13 @@ import java.util.function.Function;
  */
 public class RomanNumerals {
 
-    private static class AccNumeral {
-        final String str;
-        final int remaining;
+    private static class Accumulator {
+        final String roman;
+        final int arabic;
 
-        public AccNumeral(String str, int remaining) {
-            this.str = str;
-            this.remaining = remaining;
+        public Accumulator(String roman, int arabic) {
+            this.roman = roman;
+            this.arabic = arabic;
         }
     }
 
@@ -48,21 +47,21 @@ public class RomanNumerals {
     final static EnumSet<RomanNumeral> ROMAN_NUMERALS = EnumSet.allOf(RomanNumeral.class);
 
     interface RomanNumeralsAccumulator {
-        AccNumeral accumulate(final AccNumeral acc, final RomanNumeral romanNumeral);
+        Accumulator accumulate(final Accumulator acc, final RomanNumeral romanNumeral);
     }
 
     private static class RomanNumeralsAccumulatorImpl implements RomanNumeralsAccumulator {
-        BiFunction<AccNumeral, RomanNumeral, Boolean> predicate;
-        BiFunction<AccNumeral, RomanNumeral, AccNumeral> combiner;
+        BiFunction<Accumulator, RomanNumeral, Boolean> predicate;
+        BiFunction<Accumulator, RomanNumeral, Accumulator> combiner;
 
-        public RomanNumeralsAccumulatorImpl(BiFunction<AccNumeral, RomanNumeral, Boolean> predicate,
-                                            BiFunction<AccNumeral, RomanNumeral, AccNumeral> combiner) {
+        public RomanNumeralsAccumulatorImpl(BiFunction<Accumulator, RomanNumeral, Boolean> predicate,
+                                            BiFunction<Accumulator, RomanNumeral, Accumulator> combiner) {
             this.predicate = predicate;
             this.combiner = combiner;
         }
 
         @Override
-        public AccNumeral accumulate(AccNumeral acc, RomanNumeral romanNumeral) {
+        public Accumulator accumulate(Accumulator acc, RomanNumeral romanNumeral) {
             if (predicate.apply(acc, romanNumeral)) {
                 return accumulate(combiner.apply(acc, romanNumeral), romanNumeral);
             } else {
@@ -72,29 +71,29 @@ public class RomanNumerals {
     }
 
     private final static RomanNumeralsAccumulator arabicToRomanAccumulator =
-            new RomanNumeralsAccumulatorImpl((acc, romanNumeral) -> acc.remaining >= romanNumeral.arabic,
-                    (acc, numeral) -> new AccNumeral(acc.str.concat(numeral.roman),
-                            acc.remaining - numeral.arabic));
+            new RomanNumeralsAccumulatorImpl((acc, romanNumeral) -> acc.arabic >= romanNumeral.arabic,
+                    (acc, numeral) -> new Accumulator(acc.roman.concat(numeral.roman),
+                            acc.arabic - numeral.arabic));
 
     private final static RomanNumeralsAccumulator romanToArabicAccumulator =
-            new RomanNumeralsAccumulatorImpl((acc, romanNumeral) -> acc.str.startsWith(romanNumeral.roman),
-                    (acc, numeral) -> new AccNumeral(acc.str.replaceFirst(numeral.roman, ""), acc.remaining + numeral.arabic));
+            new RomanNumeralsAccumulatorImpl((acc, romanNumeral) -> acc.roman.startsWith(romanNumeral.roman),
+                    (acc, numeral) -> new Accumulator(acc.roman.replaceFirst(numeral.roman, ""), acc.arabic + numeral.arabic));
 
-    private static <T> T reduce(AccNumeral accNumeral, BiFunction<AccNumeral, RomanNumeral, AccNumeral> accumulator,
-                                Function<AccNumeral, T> extractResult) {
-        final AccNumeral result = ROMAN_NUMERALS.stream().reduce(accNumeral,
+    private static <T> T reduce(Accumulator accNumeral, BiFunction<Accumulator, RomanNumeral, Accumulator> accumulator,
+                                Function<Accumulator, T> extractResult) {
+        final Accumulator result = ROMAN_NUMERALS.stream().reduce(accNumeral,
                 accumulator::apply,
                 (accNumeral1, accNumeral2) ->
-                        new AccNumeral(accNumeral1.str + accNumeral2.str, accNumeral.remaining - accNumeral2.remaining));
+                        new Accumulator(accNumeral1.roman + accNumeral2.roman, accNumeral.arabic - accNumeral2.arabic));
         return extractResult.apply(result);
     }
 
     public static String arabicToRoman(final int arabic) {
-        return reduce(new AccNumeral(arabic < 0 ? "-" : "", Math.abs(arabic)), arabicToRomanAccumulator::accumulate,
-                x -> x.str);
+        return reduce(new Accumulator(arabic < 0 ? "-" : "", Math.abs(arabic)), arabicToRomanAccumulator::accumulate,
+                x -> x.roman);
     }
 
     public static int romanToArabic(String roman) {
-        return reduce(new AccNumeral(roman, 0), romanToArabicAccumulator::accumulate, x -> x.remaining);
+        return reduce(new Accumulator(roman, 0), romanToArabicAccumulator::accumulate, x -> x.arabic);
     }
 }

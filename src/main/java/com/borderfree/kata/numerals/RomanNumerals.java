@@ -53,21 +53,18 @@ public class RomanNumerals {
 
     private static class RomanNumeralsAccumulatorImpl implements RomanNumeralsAccumulator {
         BiFunction<AccNumeral, RomanNumeral, Boolean> predicate;
-        BinaryOperator<String> romanCombiner;
-        BinaryOperator<Integer> arabicCombiner;
+        BiFunction<AccNumeral, RomanNumeral, AccNumeral> combiner;
 
         public RomanNumeralsAccumulatorImpl(BiFunction<AccNumeral, RomanNumeral, Boolean> predicate,
-                                            BinaryOperator<String> romanCombiner, BinaryOperator<Integer> arabicCombiner) {
+                                            BiFunction<AccNumeral, RomanNumeral, AccNumeral> combiner) {
             this.predicate = predicate;
-            this.romanCombiner = romanCombiner;
-            this.arabicCombiner = arabicCombiner;
+            this.combiner = combiner;
         }
 
         @Override
         public AccNumeral accumulate(AccNumeral acc, RomanNumeral romanNumeral) {
             if (predicate.apply(acc, romanNumeral)) {
-                return accumulate(new AccNumeral(romanCombiner.apply(acc.str, romanNumeral.roman),
-                        arabicCombiner.apply(acc.remaining, romanNumeral.arabic)), romanNumeral);
+                return accumulate(combiner.apply(acc, romanNumeral), romanNumeral);
             } else {
                 return acc;
             }
@@ -76,13 +73,12 @@ public class RomanNumerals {
 
     private final static RomanNumeralsAccumulator arabicToRomanAccumulator =
             new RomanNumeralsAccumulatorImpl((acc, romanNumeral) -> acc.remaining >= romanNumeral.arabic,
-                    String::concat,
-                    Math::subtractExact);
+                    (acc, numeral) -> new AccNumeral(acc.str.concat(numeral.roman),
+                            acc.remaining - numeral.arabic));
 
     private final static RomanNumeralsAccumulator romanToArabicAccumulator =
             new RomanNumeralsAccumulatorImpl((acc, romanNumeral) -> acc.str.startsWith(romanNumeral.roman),
-                    (str, roman) -> str.replaceFirst(roman, ""),
-                    Math::addExact);
+                    (acc, numeral) -> new AccNumeral(acc.str.replaceFirst(numeral.roman, ""), acc.remaining + numeral.arabic));
 
     private static <T> T reduce(AccNumeral accNumeral, BiFunction<AccNumeral, RomanNumeral, AccNumeral> accumulator,
                                 Function<AccNumeral, T> extractResult) {
